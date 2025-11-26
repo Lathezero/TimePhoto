@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iCloud 视频库</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 20px 0;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .admin-link {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .admin-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .search-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .search-section h1 {
+            color: white;
+            font-size: 36px;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+        
+        .search-section p {
+            color: rgba(255,255,255,0.9);
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+        
+        .search-box {
+            max-width: 500px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            outline: none;
+            transition: box-shadow 0.3s;
+        }
+        
+        .search-input:focus {
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .video-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+        
+        .video-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        
+        .video-thumbnail {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 14px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px 12px 0 0;
+        }
+        
+        .video-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #f8f9fa;
+        }
+        
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #667eea;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .video-card:hover .play-button {
+            opacity: 1;
+        }
+        
+        .video-info {
+            padding: 20px;
+        }
+        
+        .video-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+            line-height: 1.4;
+        }
+        
+        .video-meta {
+            color: #666;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .view-count {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .upload-time {
+            font-size: 12px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .empty-state h2 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .search-section h1 {
+                font-size: 28px;
+            }
+            
+            .video-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 20px;
+            }
+            
+            .container {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">☁ iCloud</div>
+            <div>
+                <a class="admin-link" href="user/login.php">用户登录</a>
+                <a class="admin-link" href="user/dashboard.php" style="margin-left:10px;">上传视频</a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="search-section">
+            <h1>iCloud</h1>
+            <p>扫描二维码，随时随地观看视频</p>
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="搜索视频..." id="searchInput">
+            </div>
+        </div>
+        
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>正在加载视频...</p>
+        </div>
+        
+        <div id="videoGrid" class="video-grid" style="display: none;"></div>
+        
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <h2>暂无视频</h2>
+            <p>还没有上传任何视频</p>
+        </div>
+    </div>
+    
+    <script>
+        let allVideos = [];
+        
+        // 加载视频列表
+        async function loadVideos() {
+            try {
+                const response = await fetch('api.php?action=list');
+                const result = await response.json();
+                
+                document.getElementById('loading').style.display = 'none';
+                
+                if (result.success && result.videos.length > 0) {
+                    allVideos = result.videos;
+                    displayVideos(allVideos);
+                } else {
+                    document.getElementById('emptyState').style.display = 'block';
+                }
+            } catch (error) {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('emptyState').style.display = 'block';
+                console.error('加载视频失败:', error);
+            }
+        }
+        
+        // 显示视频列表
+        function displayVideos(videos) {
+            const grid = document.getElementById('videoGrid');
+            grid.innerHTML = '';
+            
+            videos.forEach(video => {
+                const card = createVideoCard(video);
+                grid.appendChild(card);
+            });
+            
+            grid.style.display = 'grid';
+        }
+        
+        // 创建视频卡片
+        function createVideoCard(video) {
+            const card = document.createElement('div');
+            card.className = 'video-card';
+            card.onclick = () => playVideo(video.qr_code);
+            
+            const thumbnail = video.cover_image 
+                ? `<img src="uploads/covers/${video.cover_image}" alt="${video.title}">`
+                : '暂无封面';
+            
+            const uploadDate = new Date(video.upload_time).toLocaleDateString('zh-CN');
+            const fileSize = (video.file_size / 1024 / 1024).toFixed(1);
+            
+            card.innerHTML = `
+                <div class="video-thumbnail">
+                    ${thumbnail}
+                    <div class="play-button">▶</div>
+                </div>
+                <div class="video-info">
+                    <div class="video-title">${escapeHtml(video.title)}</div>
+                    <div class="video-meta">
+                        <div class="view-count">
+                            <span>👁</span>
+                            <span>${video.views} 次观看</span>
+                        </div>
+                        <div class="upload-time">上传者：${escapeHtml(video.uploader_username || '未知')}</div>
+                        <div class="upload-time">${uploadDate}</div>
+                    </div>
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        // 播放视频
+        function playVideo(qrCode) {
+            window.open(`play.php?qr=${qrCode}`, '_blank');
+        }
+        
+        // HTML转义
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // 搜索功能
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            if (searchTerm === '') {
+                displayVideos(allVideos);
+            } else {
+                const filteredVideos = allVideos.filter(video => 
+                    video.title.toLowerCase().includes(searchTerm) ||
+                    video.original_name.toLowerCase().includes(searchTerm)
+                );
+                displayVideos(filteredVideos);
+            }
+        });
+        
+        // 页面加载完成后加载视频
+        document.addEventListener('DOMContentLoaded', loadVideos);
+    </script>
+</body>
+</html>
