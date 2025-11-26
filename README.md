@@ -55,6 +55,23 @@
 - 初始化：
   - 访问 `install.php` 自动建表并创建管理员账户
   - 默认管理员：`admin` / `admin123`（登录后请尽快修改密码）
+  
+  修改用户名
+- 按用户名：
+  - UPDATE admin_users SET username='new_admin' WHERE username='admin';
+- 或按 id ：
+  - UPDATE admin_users SET username='new_admin' WHERE id=1;
+
+  修改密码（需使用 password_hash 生成的散列）
+- 先生成散列（示例密码 NewPass123! ）：
+  - 命令行方式（PHP CLI）： php -r "echo password_hash('NewPass123!', PASSWORD_DEFAULT), PHP_EOL;"
+  - 或在任何 PHP 环境中运行： <?php echo password_hash('NewPass123!', PASSWORD_DEFAULT); ?>
+- 将生成的散列替换到下方的 HASH_VALUE ：
+  - 按用户名：
+    - UPDATE admin_users SET password='HASH_VALUE' WHERE username='new_admin';
+  - 按 id ：
+    - UPDATE admin_users SET password='HASH_VALUE' WHERE id=1;
+
 - 上传参数（主 php.ini）：
   - `upload_max_filesize=512M`
   - `post_max_size=600M`
