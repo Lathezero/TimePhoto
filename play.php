@@ -33,6 +33,8 @@ if ($qrCode) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $video ? htmlspecialchars($video['title']) : '视频播放'; ?> - iCloud</title>
+    <!-- 图标库：Font Awesome（可回滚：移除此<link>） -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-9b4b8S7dCzWQ8Q6CkqzC0hRrj3mNf3kqj1xZpG7WQG9tHqFv9z5TVmQXQw3k4Xk9H6Yj6lqQWJmCwYbQbQ5k0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         * {
             margin: 0;
@@ -313,19 +315,19 @@ if ($qrCode) {
                 <div class="video-title"><?php echo htmlspecialchars($video['title']); ?></div>
                 <div class="video-meta">
                     <div class="meta-item">
-                        <span>👁</span>
+                        <span class="fa-solid fa-eye" aria-hidden="true"></span>
                         <span><?php echo $video['views']; ?> 次观看</span>
                     </div>
                     <div class="meta-item">
-                        <span>📅</span>
+                        <span class="fa-solid fa-calendar" aria-hidden="true"></span>
                         <span><?php echo date('Y-m-d', strtotime($video['upload_time'])); ?></span>
                     </div>
                     <div class="meta-item">
-                        <span>👤</span>
+                        <span class="fa-solid fa-user" aria-hidden="true"></span>
                         <span><?php echo htmlspecialchars($video['uploader_username'] ?? '未知'); ?></span>
                     </div>
                     <div class="meta-item">
-                        <span>📁</span>
+                        <span class="fa-solid fa-file" aria-hidden="true"></span>
                         <span><?php echo round($video['file_size'] / 1024 / 1024, 1); ?> MB</span>
                     </div>
                 </div>
@@ -344,6 +346,38 @@ if ($qrCode) {
             </div>
         </div>
         
+        <!-- 增强样式：主题变量、信息面板与控件动效（可回滚：移除本<style>块） -->
+        <style id="enhance-styles">
+          :root {
+            --brand-start: #667eea; --brand-end: #764ba2;
+            --text-primary: #ffffff; --text-secondary: rgba(255,255,255,0.78);
+            --radius-md: 12px; --shadow-soft: 0 10px 30px rgba(0,0,0,0.12);
+            --transition-fast: 0.3s ease-in-out; --transition-mid: 0.4s ease-in-out;
+          }
+
+          .video-info { transition: transform var(--transition-mid), opacity var(--transition-mid); opacity: 0; }
+          .video-info.show { opacity: 1; }
+          .video-title { letter-spacing: 0.2px; }
+          .video-meta { border-top: 1px solid rgba(255,255,255,0.12); padding-top: 12px; }
+
+          .control-btn { transition: transform var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast); }
+          .control-btn:hover { transform: scale(1.06); }
+          .control-btn:active { transform: scale(0.98); }
+          .control-btn:focus-visible { outline: 3px solid rgba(102,126,234,0.6); outline-offset: 2px; }
+
+          /* 顶部导航滚动增强（若出现滚动） */
+          #header { transition: background var(--transition-fast), box-shadow var(--transition-fast); }
+          #header.scrolled { background: rgba(0,0,0,0.9); box-shadow: 0 12px 30px rgba(0,0,0,0.35); }
+        </style>
+
+        <!-- 增强脚本：信息面板淡入、导航滚动状态（可回滚：移除本<script>块） -->
+        <script id="enhance-scripts">
+          (function() {
+            const headerEl = document.getElementById('header');
+            function onScroll() { const y = window.scrollY || document.documentElement.scrollTop; if (!headerEl) return; if (y > 50) headerEl.classList.add('scrolled'); else headerEl.classList.remove('scrolled'); }
+            window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+          })();
+        </script>
         <script>
             const video = document.getElementById('videoPlayer');
             const header = document.getElementById('header');

@@ -23,6 +23,8 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>我的视频 - iCloud</title>
+    <!-- 图标库：Font Awesome（可回滚：移除此<link>） -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-9b4b8S7dCzWQ8Q6CkqzC0hRrj3mNf3kqj1xZpG7WQG9tHqFv9z5TVmQXQw3k4Xk9H6Yj6lqQWJmCwYbQbQ5k0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body { font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f5f5f5; }
@@ -30,23 +32,51 @@ try {
         .wrap { max-width:1200px; margin:0 auto; padding:0 20px; display:flex; justify-content:space-between; align-items:center; }
         .btn { padding:8px 14px; background:rgba(255,255,255,0.2); color:#fff; border:none; border-radius:5px; text-decoration:none; }
         .container { max-width:1200px; margin:20px auto; padding:20px; }
-        .card { background:#fff; border-radius:10px; box-shadow:0 2px 10px rgba(0,0,0,0.1); margin-bottom:20px; }
+        .card { background:var(--surface,#f7f9ff); border-radius:var(--radius-md,12px); box-shadow:0 10px 30px rgba(0,0,0,0.12); margin-bottom:20px; }
         .card h2 { margin:0; padding:20px 30px; border-bottom:1px solid #e1e1e1; }
         .content { padding:20px 30px; }
         .form-group { margin-bottom:16px; }
-        label { display:block; margin-bottom:6px; color:#333; }
-        input { width:100%; padding:12px; border:2px solid #e1e1e1; border-radius:6px; }
-        input:focus { outline:none; border-color:#667eea; }
-        .upload-btn { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:#fff; border:none; border-radius:6px; padding:12px 24px; cursor:pointer; }
+        label { display:block; margin-bottom:6px; color:#333; transition: all 0.3s ease-in-out; }
+        input { width:100%; padding:12px; border:2px solid #e1e1e1; border-radius:var(--radius-md,12px); transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out; }
+        input:focus { outline:none; border-color:#667eea; box-shadow: 0 10px 30px rgba(0,0,0,0.12); }
+        .upload-btn { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:#fff; border:none; border-radius:var(--radius-md,12px); padding:12px 24px; cursor:pointer; transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; }
+        .upload-btn:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 10px 30px rgba(0,0,0,0.12); }
+        .upload-btn:active { transform: scale(0.98); }
         .video-item { padding:20px 30px; border-bottom:1px solid #e1e1e1; display:grid; grid-template-columns:120px 1fr auto; gap:20px; }
         .video-actions { display:flex; gap:10px; }
-        .btn-mini { padding:6px 10px; border:none; border-radius:4px; color:#fff; cursor:pointer; }
+        .btn-mini { padding:6px 10px; border:none; border-radius:var(--radius-md,12px); color:#fff; cursor:pointer; transition: transform 0.3s ease-in-out, filter 0.3s ease-in-out; }
+        .btn-mini:hover { transform: translateY(-1px) scale(1.02); filter: brightness(1.05); }
+        .btn-mini:active { transform: scale(0.98); }
         .primary { background:#007bff; }
         .success { background:#28a745; }
         .danger { background:#dc3545; }
         .message { display:none; margin-bottom:16px; padding:12px; border-radius:6px; }
         .message.success { display:block; background:#e8f7ee; color:#1a7f37; border:1px solid #b7e4c7; }
         .message.error { display:block; background:#fee; color:#c33; border:1px solid #fcc; }
+        /* 骨架屏与进场动画（动画时长 0.3s，ease-in-out） */
+        .skeleton { background: linear-gradient(90deg, #f0f2f5 25%, #e2e6ea 37%, #f0f2f5 63%); background-size: 400% 100%; animation: shimmer 1.2s ease-in-out infinite; }
+        @keyframes shimmer { 0% { background-position: 100% 0 } 100% { background-position: 0 0 } }
+        .fade-in-up { opacity: 0; transform: translateY(12px); animation: fadeUp 0.3s ease-in-out forwards; }
+        @keyframes fadeUp { to { opacity: 1; transform: translateY(0) } }
+        /* 二维码弹窗淡入淡出与居中布局 */
+        #qrModal { transition: opacity 0.3s ease-in-out; display: none; }
+        #qrModal.open { display: block; opacity: 1; }
+        #qrModal:not(.open) { opacity: 0; }
+        @media (max-width: 768px) {
+          .video-item { grid-template-columns: 1fr; gap: 16px; }
+        }
+    </style>
+    <!-- 返回顶部样式（可回滚：移除此<style>） -->
+    <style id="enhance-backtotop-styles">
+      #backToTop { position: fixed; right: 20px; bottom: 24px; z-index: 999; opacity: 0; pointer-events: none; transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; border: none; border-radius: 999px; padding: 10px 14px; font-weight: 600; color: #fff; background: linear-gradient(135deg, var(--brand-start, #667eea), var(--brand-end, #764ba2)); box-shadow: var(--shadow-soft, 0 10px 30px rgba(0,0,0,0.12)); }
+      #backToTop.show { opacity: 1; pointer-events: auto; }
+      #backToTop:hover { transform: translateY(-2px) scale(1.02); }
+      #backToTop:active { transform: scale(0.98); }
+    </style>
+    <!-- 增强样式变量（可回滚：移除此<style>） -->
+    <style id="enhance-styles-vars">
+      :root { --brand-start:#667eea; --brand-end:#764ba2; --radius-md:12px; --surface:#f7f9ff; --shadow-soft:0 10px 30px rgba(0,0,0,0.12); --transition-fast:0.3s ease-in-out; }
+      a:focus-visible, button:focus-visible { outline:3px solid rgba(102,126,234,0.6); outline-offset:2px; }
     </style>
     </head>
 <body>
@@ -113,7 +143,7 @@ try {
         <input type="hidden" id="coverVideoId">
     </form>
     <div id="qrModal" class="modal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background:rgba(0,0,0,0.5)">
-        <div class="modal-content" style="background:#fff; margin:10% auto; padding:20px; border-radius:10px; width:90%; max-width:500px; text-align:center; position:relative;">
+        <div class="modal-content" style="background:var(--surface,#f7f9ff); margin:10% auto; padding:20px; border-radius:10px; width:90%; max-width:500px; text-align:center; position:relative;">
             <span class="close" onclick="closeModal()" style="position:absolute; right:12px; top:8px; font-size:24px; cursor:pointer">&times;</span>
             <h3>视频二维码</h3>
             <div id="qrCodeContainer" style="margin-top:10px"></div>
@@ -121,6 +151,13 @@ try {
         </div>
     </div>
     <script>
+        // 输入反馈：焦点时 label 上移与高亮（仅样式，不改逻辑）
+        document.querySelectorAll('.form-group input').forEach(function(input){
+          const label = input.closest('.form-group').querySelector('label');
+          input.addEventListener('focus', function(){ if(label){ label.style.color = '#667eea'; label.style.transform = 'translateY(-2px)'; } });
+          input.addEventListener('blur', function(){ if(label){ label.style.color = '#333'; label.style.transform = 'translateY(0)'; } });
+        });
+
         function showMessage(msg, type) {
             const el = document.getElementById('message');
             el.textContent = msg; el.className = 'message ' + type; el.style.display = 'block';
@@ -176,6 +213,7 @@ try {
             linkDiv.innerHTML = '链接：<a href="' + videoUrl + '" target="_blank">' + videoUrl + '</a>';
             container.appendChild(linkDiv);
             modal.style.display = 'block';
+            requestAnimationFrame(() => modal.classList.add('open')); // 弹窗淡入
         }
         function showOnlineQR(container, videoUrl) {
             const qrApiUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(videoUrl);
@@ -186,7 +224,21 @@ try {
             };
             container.appendChild(img);
         }
-        function closeModal() { document.getElementById('qrModal').style.display = 'none'; }
+        function closeModal() { const m = document.getElementById('qrModal'); m.classList.remove('open'); setTimeout(() => { m.style.display = 'none'; }, 200); }
+
+        // 列表图片懒加载与骨架：不影响现有逻辑
+        document.addEventListener('DOMContentLoaded', function(){
+          document.querySelectorAll('.content img').forEach(function(img){
+            if(!img.hasAttribute('loading')) img.setAttribute('loading','lazy');
+            img.classList.add('skeleton'); img.addEventListener('load', function(){ img.classList.remove('skeleton'); });
+          });
+          // 列表项进场
+          document.querySelectorAll('.video-item').forEach(function(item, idx){ item.classList.add('fade-in-up'); item.style.animationDelay = (idx * 0.1) + 's'; });
+          // 返回顶部按钮
+          const btn = document.createElement('button'); btn.id = 'backToTop'; btn.setAttribute('aria-label', '返回顶部'); btn.textContent = '↑ 顶部'; document.body.appendChild(btn);
+          function toggleBtn(){ const y = window.scrollY || document.documentElement.scrollTop; if (y > 300) btn.classList.add('show'); else btn.classList.remove('show'); }
+          window.addEventListener('scroll', toggleBtn, { passive: true }); toggleBtn(); btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+        });
     </script>
 </body>
 </html>

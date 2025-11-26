@@ -55,22 +55,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>个人资料</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-9b4b8S7dCzWQ8Q6CkqzC0hRrj3mNf3kqj1xZpG7WQG9tHqFv9z5TVmQXQw3k4Xk9H6Yj6lqQWJmCwYbQbQ5k0w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style id="enhance-styles-vars">
+      :root { --brand-start:#667eea; --brand-end:#764ba2; --bg-neutral:#f6f7fb; --surface:#f7f9ff; --text-primary:#1f2937; --text-secondary:#4b5563; --radius-md:12px; --shadow-soft:0 10px 30px rgba(0,0,0,0.12); --shadow-hover:0 16px 40px rgba(0,0,0,0.18); --transition-fast:0.3s ease-in-out; }
+      a:focus-visible, button:focus-visible, input:focus-visible { outline:3px solid rgba(102,126,234,0.6); outline-offset:2px; }
+    </style>
     <style>
         * { margin:0; padding:0; box-sizing:border-box; }
-        body { font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f5f5f5; min-height:100vh; }
-        .header { background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:#fff; padding:16px; }
-        .container { max-width:800px; margin:20px auto; background:#fff; padding:24px; border-radius:10px; box-shadow:0 10px 25px rgba(0,0,0,0.1); }
-        h1 { font-size:22px; margin-bottom:16px; color:#333; }
+        body { font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:var(--bg-neutral); min-height:100vh; color:var(--text-primary); }
+        .header { background:linear-gradient(135deg,var(--brand-start) 0%,var(--brand-end) 100%); color:#fff; padding:16px; }
+        .container { max-width:800px; margin:20px auto; background:var(--surface); padding:24px; border-radius:var(--radius-md); box-shadow:var(--shadow-soft); }
+        h1 { font-size:22px; margin-bottom:16px; color:var(--text-primary); }
         .form-group { margin-bottom:16px; }
-        label { display:block; margin-bottom:6px; color:#333; }
-        input { width:100%; padding:12px; border:2px solid #e1e1e1; border-radius:6px; font-size:16px; }
-        input:focus { outline:none; border-color:#667eea; }
+        label { display:block; margin-bottom:6px; color:var(--text-secondary); transition: color var(--transition-fast), transform var(--transition-fast); }
+        input { width:100%; padding:12px; border:2px solid #e1e1e1; border-radius:var(--radius-md); font-size:16px; transition: border-color var(--transition-fast), box-shadow var(--transition-fast); }
+        input:focus { outline:none; border-color:var(--brand-start); box-shadow:var(--shadow-soft); }
         .row { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
-        .error { background:#fee; color:#c33; padding:10px; border:1px solid #fcc; border-radius:6px; margin-bottom:16px; }
-        .success { background:#e8f7ee; color:#1a7f37; padding:10px; border:1px solid #b7e4c7; border-radius:6px; margin-bottom:16px; }
-        .btn { padding:12px 18px; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:#fff; border:none; border-radius:6px; font-size:16px; cursor:pointer; }
+        .error { background:#fee; color:#c33; padding:10px; border:1px solid #fcc; border-radius:var(--radius-md); margin-bottom:16px; }
+        .success { background:#e8f7ee; color:#1a7f37; padding:10px; border:1px solid #b7e4c7; border-radius:var(--radius-md); margin-bottom:16px; }
+        .btn { padding:12px 18px; background:linear-gradient(135deg,var(--brand-start) 0%,var(--brand-end) 100%); color:#fff; border:none; border-radius:var(--radius-md); font-size:16px; cursor:pointer; transition: transform var(--transition-fast), box-shadow var(--transition-fast); }
+        .btn:hover { transform: translateY(-2px) scale(1.02); box-shadow:var(--shadow-hover); }
+        .btn:active { transform: scale(0.98); }
         .actions { display:flex; justify-content:space-between; align-items:center; margin-top:12px; }
-        a { color:#667eea; text-decoration:none; }
+        a { color:var(--brand-start); text-decoration:none; }
+        @media (max-width:768px) { .row { grid-template-columns: 1fr; } .container { margin:12px auto; padding:20px; } }
     </style>
     </head>
 <body>
